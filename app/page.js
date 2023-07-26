@@ -1,8 +1,72 @@
-import Image from 'next/image'
+"use client"
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { io } from 'socket.io-client';
+import Modal from '@mui/material/Modal';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import ringSound from './eventually.mp3';
 
+let socket;
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 800,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
 export default function Home() {
+  const [data, setData] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [nextCandidates, setNextCandidates] = useState([]);
+
+  async function fetchDT() {
+    const { data: resp } = await axios.get("http://localhost:4000/all");
+    setData(resp);
+  }
+  const playMusic = () => {
+    // Replace 'your-music-file.mp3' with the path to your music file
+    const audio = new Audio(ringSound);
+    audio.play();
+  };
+  useEffect(() => {
+    const removeFirstItem = () => {
+      setNextCandidates((prevItems) => prevItems.slice(1));
+      setOpen(false);
+    };
+    console.log(nextCandidates)
+
+    // Check if there are items to display and start the timer
+    if (nextCandidates.length > 0) {
+      setOpen(true);
+      playMusic();
+      const timer = setTimeout(removeFirstItem, 5000);
+
+      // Clean up the timer when the component unmounts or when the displayedItems change
+      return () => clearTimeout(timer);
+    }
+  }, [nextCandidates]);
+
+  useEffect(() => {
+    socket = io("http://localhost:4000");
+    fetchDT()
+    socket.on("connect", () => {
+      socket.on("update-candidates", (resData) => {
+        setData(resData);
+      });
+      socket.on("ring", (nextCandidate, caller) => {
+        setNextCandidates((prevItems) => [...prevItems, { ...nextCandidate, ...caller }]);
+      });
+    });
+  }, []);
+
   return (
     <main className="flex p-4">
+
       <div className='pending-section'>
         <div className='section-title flex'>
           Pending Candidates <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-10 h-10">
@@ -10,14 +74,14 @@ export default function Home() {
           </svg>
 
         </div>
-        <div className='each-queue flex'>
-          <div>fsdf</div>
-          <div>fsdf</div>
-        </div>
-        <div className='each-queue flex'>
-          <div>fsdf</div>
-          <div>fsdf</div>
-        </div>
+        {data.pending &&
+          data.pending.map((cand, indx) => (
+            <div key={indx} className='each-queue flex'>
+              <div>{cand.candidate}</div>
+              <div>{cand.id}</div>
+            </div>
+          ))
+        }
       </div>
       <div className='ready-section'>
         <div className='section-title flex'>
@@ -26,17 +90,35 @@ export default function Home() {
           </svg>
 
         </div>
-        <div className='each-queue flex'>
-          <div>fsdf</div>
-          <div>fsdf</div>
-        </div>
-        <div className='each-queue flex'>
-          <div>fsdf</div>
-          <div>fsdf</div>
-        </div>
+
+        {data && data.complete &&
+          data.complete.reverse().map((cand, indx) => (
+            <div key={indx} className='each-queue flex'>
+              <div>{cand.candidate}</div>
+              <div>{cand.id}</div>
+            </div>
+          ))
+        }
       </div>
+
+      <Modal
+        open={open}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="modal-modal-title" variant="h3" component="h1">
+            <h1 style={{ textAlign: "center", color: "#6528F7", fontSize: "4.5rem" }}>Candidate № {nextCandidates[0] && nextCandidates[0].id}</h1>
+            <br />
+            <h1 style={{ textAlign: "center", color: "#322653" }}>{nextCandidates[0] && nextCandidates[0].candidate}, please go to room №{nextCandidates[0] && nextCandidates[0].room} <br />
+              Your examiner is: {nextCandidates[0] && nextCandidates[0].examinerName}</h1><br />
+            <h2 style={{ color: "#C51605", textAlign: "center", fontSize: "2rem" }}>Good Luck!</h2>
+          </Typography>
+        </Box>
+      </Modal>
     </main>
   )
 }
+
 
 
