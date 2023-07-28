@@ -10,6 +10,11 @@ let socket;
 export default function Examiner() {
     useEffect(() => {
         socket = io("http://localhost:4000");
+        socket.on("connect", () => {
+            socket.on("inform", (number) => {
+                alert("this candidate Id is " + number);
+            });
+        });
     }, []);
 
     const [inputVal, setInputval] = useState("");

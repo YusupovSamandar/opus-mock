@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
+import axios from 'axios';
 let socket;
 export default function Examiner() {
 
@@ -22,7 +23,10 @@ export default function Examiner() {
             const room = prompt("Please enter your room number");
             const examinerName = prompt("Please enter your name");
             localStorage.setItem('examiner-details', JSON.stringify({ room, examinerName }));
-            window.location.reload();
+            (async function () {
+                await axios.post("http://localhost:4000/examiners", { examinerName });
+                window.location.reload();
+            })()
         }
         socket = io("http://localhost:4000");
         socket.on("connect", () => {
