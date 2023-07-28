@@ -6,6 +6,8 @@ import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import ringSound from './eventually.mp3';
+import TextField from '@mui/material/TextField';
+
 
 let socket;
 const style = {
@@ -21,11 +23,14 @@ const style = {
 };
 export default function Home() {
   const [data, setData] = useState([]);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [nextCandidates, setNextCandidates] = useState([]);
 
   async function fetchDT() {
-    const { data: resp } = await axios.get("http://localhost:4000/all");
+    let { data: resp } = await axios.get("http://localhost:4000/all");
+    let newArr = resp.complete;
+    newArr.reverse();
+    resp = { ...resp, complete: newArr }
     setData(resp);
   }
   const playMusic = () => {
@@ -38,7 +43,6 @@ export default function Home() {
       setNextCandidates((prevItems) => prevItems.slice(1));
       setOpen(false);
     };
-    console.log(nextCandidates)
 
     // Check if there are items to display and start the timer
     if (nextCandidates.length > 0) {
@@ -56,6 +60,9 @@ export default function Home() {
     fetchDT()
     socket.on("connect", () => {
       socket.on("update-candidates", (resData) => {
+        let newArr = resData.complete;
+        newArr.reverse();
+        resData = { ...resData, complete: newArr }
         setData(resData);
       });
       socket.on("ring", (nextCandidate, caller) => {
@@ -92,7 +99,7 @@ export default function Home() {
         </div>
 
         {data && data.complete &&
-          data.complete.reverse().map((cand, indx) => (
+          data.complete.map((cand, indx) => (
             <div key={indx} className='each-queue flex'>
               <div>#{cand.id}</div>
               <div>room: {cand.room}</div>
@@ -108,10 +115,10 @@ export default function Home() {
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h3" component="h1">
-            <h1 style={{ textAlign: "center", color: "#6528F7", fontSize: "4.5rem" }}>Candidate № {nextCandidates[0] && nextCandidates[0].id}</h1>
+            <p style={{ textAlign: "center", color: "#6528F7", fontSize: "4.5rem" }}>Candidate № {nextCandidates[0] && nextCandidates[0].id}</p>
             <br />
-            <h1 style={{ textAlign: "center", color: "#322653" }}>{nextCandidates[0] && nextCandidates[0].candidate}, please go to room №{nextCandidates[0] && nextCandidates[0].room} <br />
-              Your examiner is: {nextCandidates[0] && nextCandidates[0].examinerName}</h1><br />
+            <p style={{ textAlign: "center", color: "#322653" }}>{nextCandidates[0] && nextCandidates[0].candidate}, please go to room №{nextCandidates[0] && nextCandidates[0].room} <br />
+              Your examiner is: {nextCandidates[0] && nextCandidates[0].examinerName}</p><br />
             <h2 style={{ color: "#C51605", textAlign: "center", fontSize: "2rem" }}>Good Luck!</h2>
           </Typography>
         </Box>

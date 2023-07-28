@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { io } from 'socket.io-client';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 import axios from 'axios';
 let socket;
 export default function Examiner() {
@@ -73,18 +74,23 @@ export default function Examiner() {
                 load &&
                 <>
                     <div div style={{ marginTop: "35vh", textAlign: "center" }}>
-                        <h1>Your current Candidate number is {currentCandidate.id}</h1>
+                        <Typography variant="h5" gutterBottom>
+                            Your current Candidate number is {currentCandidate.id}
+                        </Typography>
+
                         <br />
-                        <h2>FullName: {currentCandidate.candidate}</h2>
+                        <Typography variant="h5" gutterBottom>
+                            FullName: {currentCandidate.candidate}
+                        </Typography>
                     </div >
                     <Stack style={{ marginTop: "100px" }} justifyContent="center" direction="row" spacing={2}>
                         <Button variant="contained" color="success" onClick={callCandidate} disabled={btnDisabled} >{btnText}</Button>
                     </Stack>
-                    <div div style={{ textAlign: "center", marginTop: "30px" }}>
-                        <h1>Your Name is {selfInfo.examinerName}</h1>
+                    <Typography variant="h5" gutterBottom style={{ textAlign: "center", marginTop: "30px" }}>
+                        <p>Your Name is: {selfInfo.examinerName}</p>
                         <br />
-                        <h2>room: {selfInfo.room}</h2>
-                    </div >
+                        <p>room: {selfInfo.room}</p>
+                    </Typography >
                     <Stack style={{ marginTop: "30px" }} justifyContent="center" direction="row" spacing={2}>
                         <Button variant="contained" onClick={reset} >Reset All</Button>
                         <Button variant="contained" onClick={resetRoom} >Reset room</Button>
