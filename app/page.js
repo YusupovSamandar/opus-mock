@@ -78,7 +78,7 @@ export default function Home() {
           data.pending.map((cand, indx) => (
             <div key={indx} className='each-queue flex'>
               <div>{cand.candidate}</div>
-              <div>{cand.id}</div>
+              <div>#{cand.id}</div>
             </div>
           ))
         }
@@ -94,8 +94,8 @@ export default function Home() {
         {data && data.complete &&
           data.complete.reverse().map((cand, indx) => (
             <div key={indx} className='each-queue flex'>
-              <div>{cand.candidate}</div>
-              <div>{cand.id}</div>
+              <div>#{cand.id}</div>
+              <div>room: {cand.room}</div>
             </div>
           ))
         }
