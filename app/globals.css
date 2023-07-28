@@ -9,6 +9,12 @@
   box-sizing: border-box;
 }
 
+button {
+  /* 1 */
+  background-color: white;
+  /* 2 */
+}
+
 .section-title {
   border-bottom: 5px solid gold;
   border-radius: 10px;
