@@ -23,7 +23,7 @@ const style = {
 };
 export default function Home() {
   const [data, setData] = useState([]);
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [nextCandidates, setNextCandidates] = useState([]);
 
   async function fetchDT() {
