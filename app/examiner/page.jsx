@@ -73,7 +73,7 @@ export default function Examiner() {
             {
                 load &&
                 <>
-                    <div div style={{ marginTop: "35vh", textAlign: "center" }}>
+                    <div div style={{ marginTop: "15vh", textAlign: "center" }}>
                         <Typography variant="h5" gutterBottom>
                             Your current Candidate number is {currentCandidate.id}
                         </Typography>
