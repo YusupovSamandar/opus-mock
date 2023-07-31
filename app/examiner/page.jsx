@@ -44,6 +44,12 @@ export default function Examiner() {
                     alert("No candidates left :(");
                 }
             });
+            socket.on("skipped", (cndID) => {
+                if (cndID) {
+                    alert(`candidate number ${cndID} is skipped`)
+                }
+            });
+
         });
     }, []);
 
@@ -67,6 +73,14 @@ export default function Examiner() {
         window.location.reload();
     }
 
+    const skipCandidate = () => {
+        setBtnDisabled(true);
+        socket.emit("skip-candidate", currentCandidate);
+        setTimeout(() => {
+            setBtnDisabled(false);
+        }, 1000);
+    }
+
 
     return (
         <>
@@ -85,6 +99,7 @@ export default function Examiner() {
                     </div >
                     <Stack style={{ marginTop: "100px" }} justifyContent="center" direction="row" spacing={2}>
                         <Button variant="contained" color="success" onClick={callCandidate} disabled={btnDisabled} >{btnText}</Button>
+                        <Button style={{ backgroundColor: !btnDisabled && "red" }} variant="contained" onClick={skipCandidate} disabled={btnDisabled} >{"cancel candidate"}</Button>
                     </Stack>
                     <Typography variant="h5" gutterBottom style={{ textAlign: "center", marginTop: "30px" }}>
                         <p>Your Name is: {selfInfo.examinerName}</p>
