@@ -75,7 +75,9 @@ export default function Examiner() {
 
     const skipCandidate = () => {
         setBtnDisabled(true);
-        socket.emit("skip-candidate", currentCandidate);
+        if (currentCandidate) {
+            socket.emit("skip-candidate", currentCandidate);
+        }
         setTimeout(() => {
             setBtnDisabled(false);
         }, 1000);
