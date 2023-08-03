@@ -7,6 +7,7 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import MenuItem from '@mui/material/MenuItem';
+import DownloadButton from "./../components/downloadButton"
 
 let socket;
 export default function Examiner() {
@@ -63,7 +64,11 @@ export default function Examiner() {
                     ))}
                 </TextField>
                 <Button variant="contained" onClick={addCandidate} disabled={buttonTx === "Processing..."}>{buttonTx}</Button>
-            </Stack>
+            </Stack><br /><br />
+            <div style={{ textAlign: "center" }}>
+                <DownloadButton />
+            </div>
+
 
         </>
     )

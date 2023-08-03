@@ -61,6 +61,7 @@ export default function Examiner() {
             setBtnText("Call Candidate");
         }, 1000);
         socket.emit("candidate-called", localStorage.getItem('examiner-details'));
+        setCurrentCandidate(false);
     }
     const reset = async () => {
         await axios.delete("http://localhost:4000/examiners", { data: { name: JSON.parse(localStorage.getItem('examiner-details')).examinerName } });
