@@ -31,7 +31,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 export default function CustomizedTables({ content }) {
     return (
 
-        <TableContainer component={Paper}>
+        <TableContainer style={{ height: "90vh" }} component={Paper}>
             <Table aria-label="customized table">
                 <TableHead>
                     <TableRow>
@@ -42,7 +42,7 @@ export default function CustomizedTables({ content }) {
                 <TableBody>
                     {content && content.map((row) => (
                         <StyledTableRow key={row.id}>
-                            <StyledTableCell component="th" scope="row">
+                            <StyledTableCell style={{ fontSize: "1.5rem", fontStyle: "italic" }} component="th" scope="row">
                                 {row.id}
                             </StyledTableCell>
                             <StyledTableCell align='right' component="th" scope="row">
