@@ -68,9 +68,10 @@ export default function Examiner() {
             });
 
             socket.on("update-data-for-examiner", (examinerN) => {
-                if (examinerN && examinerN === selfInfo.examinerName) {
+                let myDetails = JSON.parse(localStorage.getItem('examiner-details'));
+                if (examinerN && examinerN === myDetails.examinerName) {
                     (async function () {
-                        const { data: thisExData } = await axios.get(`http://localhost:4000/all/${thisExaminerDetails.examinerName}`);
+                        const { data: thisExData } = await axios.get(`http://localhost:4000/all/${myDetails.examinerName}`);
                         setMyAllCandidates(thisExData);
                     })()
                 }
@@ -104,6 +105,7 @@ export default function Examiner() {
         setBtnDisabled(true);
         if (currentCandidate) {
             socket.emit("skip-candidate", currentCandidate);
+            setCurrentCandidate(false);
         }
         setTimeout(() => {
             setBtnDisabled(false);
