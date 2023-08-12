@@ -24,6 +24,7 @@ export default function Examiner() {
         })();
     }, []);
 
+    const [candidateID, setCandidateID] = useState("");
     const [inputVal, setInputval] = useState("");
     const [examiners, setExaminers] = useState([]);
     const [chosenExaminer, setChosenExaminer] = useState("");
@@ -31,10 +32,11 @@ export default function Examiner() {
 
     const addCandidate = () => {
         setButtonTx("Processing...");
-        if (inputVal.length > 0 && chosenExaminer.length > 0) {
-            socket.emit("add-candidate", { name: inputVal, examiner: chosenExaminer });
+        if (candidateID.length > 0 && inputVal.length > 0 && chosenExaminer.length > 0) {
+            socket.emit("add-candidate", { name: inputVal, examiner: chosenExaminer, id: candidateID });
             setInputval("");
             setChosenExaminer("");
+            setCandidateID("");
         } else {
             alert("please enter name");
         }
@@ -46,6 +48,7 @@ export default function Examiner() {
     return (
         <>
             <Stack style={{ marginTop: "100px" }} justifyContent="center" direction="row" spacing={2}>
+                <TextField id="outlined-basic" label="CandidateID" onChange={(e) => { setCandidateID(e.target.value) }} value={candidateID} variant="outlined" />
                 <TextField id="outlined-basic" label="Fullname" onChange={(e) => { setInputval(e.target.value) }} value={inputVal} variant="outlined" />
                 <TextField
                     id="outlined-select-currency"
