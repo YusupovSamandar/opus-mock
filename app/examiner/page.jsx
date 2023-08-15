@@ -39,8 +39,8 @@ export default function Examiner() {
         }
 
         if (!localStorage.getItem('examiner-details')) {
-            let room = prompt("Please enter your room number");
-            let examinerName = prompt("Please enter your name");
+            let room = prompt("Please enter your room number").trim();
+            let examinerName = prompt("Please enter your name").trim();
             while (!room || !examinerName || room.length === 0 || examinerName.length === 0) {
                 room = prompt("Please enter your room number");
                 examinerName = prompt("Please enter your name");
