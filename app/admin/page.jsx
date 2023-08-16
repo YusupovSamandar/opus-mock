@@ -7,21 +7,31 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import MenuItem from '@mui/material/MenuItem';
-import DownloadButton from "./../components/downloadButton"
+import DownloadButton from "./../components/downloadButton";
+require('dotenv').config();
 
-let socket;
+const apiURL = process.env.NEXT_PUBLIC_API_URL;
+
 export default function Examiner() {
+    const [socket, setSocket] = useState(null);
+
+    const informHandler = (number) => {
+        alert("this candidate Id is " + number);
+    }
     useEffect(() => {
-        socket = io("http://localhost:4000");
-        socket.on("connect", () => {
-            socket.on("inform", (number) => {
-                alert("this candidate Id is " + number);
-            });
+        let newSocket = io(apiURL);
+        setSocket(newSocket);
+        newSocket.on("connect", () => {
+            newSocket.on("inform", informHandler);
         });
         (async function () {
-            const { data: allExaminers } = await axios.get("http://localhost:4000/examiners")
+            const { data: allExaminers } = await axios.get(`${apiURL}/examiners`)
             setExaminers(allExaminers);
         })();
+        return () => {
+            newSocket.off("inform", informHandler);
+            newSocket.disconnect();
+        };
     }, []);
 
     const [candidateID, setCandidateID] = useState("");

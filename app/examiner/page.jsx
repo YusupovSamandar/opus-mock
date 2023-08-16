@@ -10,8 +10,10 @@ import Typography from '@mui/material/Typography';
 
 import LabTabs from "./../components/swtichTabs";
 import CandidatesTable from "./../components/table";
+require('dotenv').config();
+const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
-let socket;
+
 export default function Examiner() {
 
     const [btnDisabled, setBtnDisabled] = useState(false);
@@ -19,25 +21,51 @@ export default function Examiner() {
     const [currentCandidate, setCurrentCandidate] = useState(false);
     const [load, setLoad] = useState(false);
     const [selfInfo, setSelfInfo] = useState({});
+    const [socket, setSocket] = useState(null);
+
 
     const [myAllCandidates, setMyAllCandidates] = useState({});
 
+    const updateExaminerDT = (examinerN) => {
+        let myDetails = JSON.parse(localStorage.getItem('examiner-details'));
+        if (examinerN && examinerN === myDetails.examinerName) {
+            (async function () {
+                const { data: thisExData } = await axios.get(`${apiURL}/all/${myDetails.examinerName}`);
+                setMyAllCandidates(thisExData);
+            })()
+        }
+    }
+
+    const skipHandler = (cndID) => {
+        if (cndID) {
+            alert(`candidate number ${cndID} is skipped`);
+            setCurrentCandidate(false);
+        }
+    }
+
+    const alertHandler = (obj) => {
+        if (obj) {
+            setCurrentCandidate(obj)
+        } else {
+            alert("No candidates left :(");
+        }
+    }
+
     useEffect(() => {
-
-
-
         if (localStorage.getItem('examiner-details')) {
             const thisExaminerDetails = JSON.parse(localStorage.getItem('examiner-details'));
             setLoad(true);
             setSelfInfo(thisExaminerDetails);
             (async function () {
-                const { data: thisExData } = await axios.get(`http://localhost:4000/all/${thisExaminerDetails.examinerName}`);
+                const { data: thisExData } = await axios.get(`${apiURL}/all/${thisExaminerDetails.examinerName}`);
                 setMyAllCandidates(thisExData);
             })()
         } else {
             setLoad(false);
         }
 
+        const newSocket = io(apiURL);
+        setSocket(newSocket);
         if (!localStorage.getItem('examiner-details')) {
             let room = prompt("Please enter your room number").trim();
             let examinerName = prompt("Please enter your name").trim();
@@ -47,37 +75,26 @@ export default function Examiner() {
             }
             localStorage.setItem('examiner-details', JSON.stringify({ room, examinerName }));
             (async function () {
-                await axios.post("http://localhost:4000/examiners", { examinerName });
+                await axios.post(`${apiURL}/examiners`, { examinerName });
                 window.location.reload();
             })()
         }
-        socket = io("http://localhost:4000");
-        socket.on("connect", () => {
-            socket.on("alert", (obj) => {
-                if (obj) {
-                    setCurrentCandidate(obj)
-                } else {
-                    alert("No candidates left :(");
-                }
-            });
 
-            socket.on("skipped", (cndID) => {
-                if (cndID) {
-                    alert(`candidate number ${cndID} is skipped`)
-                }
-            });
+        newSocket.on("connect", () => {
+            newSocket.on("alert", alertHandler);
 
-            socket.on("update-data-for-examiner", (examinerN) => {
-                let myDetails = JSON.parse(localStorage.getItem('examiner-details'));
-                if (examinerN && examinerN === myDetails.examinerName) {
-                    (async function () {
-                        const { data: thisExData } = await axios.get(`http://localhost:4000/all/${myDetails.examinerName}`);
-                        setMyAllCandidates(thisExData);
-                    })()
-                }
-            });
+            newSocket.on("skipped", skipHandler);
+
+            newSocket.on("update-data-for-examiner", updateExaminerDT);
 
         });
+
+        return () => {
+            newSocket.off("alert", alertHandler)
+            newSocket.off("skipped", skipHandler)
+            newSocket.off("update-data-for-examiner", updateExaminerDT)
+            newSocket.disconnect();
+        };
     }, []);
 
     const callCandidate = () => {
@@ -91,7 +108,7 @@ export default function Examiner() {
         setCurrentCandidate(false);
     }
     const reset = async () => {
-        await axios.delete("http://localhost:4000/examiners", { data: { name: JSON.parse(localStorage.getItem('examiner-details')).examinerName } });
+        await axios.delete(`${apiURL}/examiners`, { data: { name: JSON.parse(localStorage.getItem('examiner-details')).examinerName } });
         localStorage.removeItem("examiner-details");
         window.location.reload();
     }
@@ -105,7 +122,6 @@ export default function Examiner() {
         setBtnDisabled(true);
         if (currentCandidate) {
             socket.emit("skip-candidate", currentCandidate);
-            setCurrentCandidate(false);
         }
         setTimeout(() => {
             setBtnDisabled(false);

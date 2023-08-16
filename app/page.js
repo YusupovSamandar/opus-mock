@@ -6,10 +6,9 @@ import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import ringSound from './eventually.mp3';
-import TextField from '@mui/material/TextField';
 
+const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
-let socket;
 const style = {
   position: 'absolute',
   top: '50%',
@@ -27,9 +26,9 @@ export default function Home() {
   const [nextCandidates, setNextCandidates] = useState([]);
 
   async function fetchDT() {
-    let { data: resp } = await axios.get("http://localhost:4000/all");
+    let { data: resp } = await axios.get(`${apiURL}/all`);
     let newArr = resp.complete;
-    newArr.reverse();
+    newArr && newArr.reverse();
     resp = { ...resp, complete: newArr }
     setData(resp);
   }
@@ -38,6 +37,7 @@ export default function Home() {
     const audio = new Audio(ringSound);
     audio.play();
   };
+
   useEffect(() => {
     const removeFirstItem = () => {
       setNextCandidates((prevItems) => prevItems.slice(1));
@@ -55,20 +55,31 @@ export default function Home() {
     }
   }, [nextCandidates]);
 
+
+  const updateCandidatesHandler = (resData) => {
+    let newArr = resData.complete;
+    console.log(resData);
+    newArr.reverse();
+    resData = { ...resData, complete: newArr }
+    setData(resData);
+  }
+  const ringHandler = (nextCandidate, caller) => {
+    setNextCandidates((prevItems) => [...prevItems, { ...nextCandidate, ...caller }]);
+  }
+
   useEffect(() => {
-    socket = io("http://localhost:4000");
-    fetchDT()
-    socket.on("connect", () => {
-      socket.on("update-candidates", (resData) => {
-        let newArr = resData.complete;
-        newArr.reverse();
-        resData = { ...resData, complete: newArr }
-        setData(resData);
-      });
-      socket.on("ring", (nextCandidate, caller) => {
-        setNextCandidates((prevItems) => [...prevItems, { ...nextCandidate, ...caller }]);
-      });
+    const newSocket = io(apiURL);
+    fetchDT();
+    newSocket.on("connect", () => {
+      newSocket.on("update-candidates", updateCandidatesHandler);
+      newSocket.on("ring", ringHandler);
     });
+
+    return () => {
+      newSocket.off("ring", ringHandler)
+      newSocket.off("update-candidates", updateCandidatesHandler)
+      newSocket.disconnect();
+    };
   }, []);
 
   return (
