@@ -168,14 +168,14 @@ export default function Examiner() {
     const MyPendingCandidatesPage = () => {
         return (
             <>
-                <CandidatesTable content={myAllCandidates.pending} />
+                <CandidatesTable customStyle={{ height: "90vh" }} content={myAllCandidates.pending} column1Key={"id"} column2Key={"candidate"} column1={"Candidate ID"} column2={"FIO"} />
             </>
         );
     }
     const MyCompleteCandidatesPage = () => {
         return (
             <>
-                <CandidatesTable content={myAllCandidates.complete} />
+                <CandidatesTable customStyle={{ height: "90vh" }} content={myAllCandidates.complete} column1={"Candidate ID"} column2={"FIO"} />
             </>
         );
     }
