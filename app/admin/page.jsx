@@ -8,6 +8,7 @@ import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import MenuItem from '@mui/material/MenuItem';
 import DownloadButton from "./../components/downloadButton";
+import ExaminersTable from "./../components/table";
 require('dotenv').config();
 
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
@@ -18,16 +19,19 @@ export default function Examiner() {
     const informHandler = (number) => {
         alert("this candidate Id is " + number);
     }
+
+    const fetchExaminersDT = async () => {
+        const { data: allExaminers } = await axios.get(`${apiURL}/examiners`)
+        setExaminers(allExaminers);
+    }
+
     useEffect(() => {
         let newSocket = io(apiURL);
         setSocket(newSocket);
         newSocket.on("connect", () => {
             newSocket.on("inform", informHandler);
         });
-        (async function () {
-            const { data: allExaminers } = await axios.get(`${apiURL}/examiners`)
-            setExaminers(allExaminers);
-        })();
+        fetchExaminersDT();
         return () => {
             newSocket.off("inform", informHandler);
             newSocket.disconnect();
@@ -47,6 +51,7 @@ export default function Examiner() {
             setInputval("");
             setChosenExaminer("");
             setCandidateID("");
+            fetchExaminersDT();
         } else {
             alert("please enter name");
         }
@@ -80,6 +85,10 @@ export default function Examiner() {
             </Stack><br /><br />
             <div style={{ textAlign: "center" }}>
                 <DownloadButton />
+                <br /><br />
+                <div className="container m-auto">
+                    <ExaminersTable customStyle={{ width: "70%", margin: "0 auto" }} column1={"examiners"} column2={"pending candidates"} content={examiners} column1Key={"examinerName"} column2Key={"pendingNumber"} />
+                </div>
             </div>
 
 

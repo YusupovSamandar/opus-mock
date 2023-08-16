@@ -28,25 +28,25 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     },
 }));
 
-export default function CustomizedTables({ content }) {
+export default function CustomizedTables({ content, column1, column2, column1Key, column2Key, customStyle }) {
     return (
 
-        <TableContainer style={{ height: "90vh" }} component={Paper}>
+        <TableContainer style={customStyle} component={Paper}>
             <Table aria-label="customized table">
                 <TableHead>
                     <TableRow>
-                        <StyledTableCell>Candidate ID</StyledTableCell>
-                        <StyledTableCell align='right'>FIO</StyledTableCell>
+                        <StyledTableCell>{column1}</StyledTableCell>
+                        <StyledTableCell align='right'>{column2}</StyledTableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
                     {content && content.map((row) => (
                         <StyledTableRow key={row.id}>
                             <StyledTableCell style={{ fontSize: "1.5rem", fontStyle: "italic" }} component="th" scope="row">
-                                {row.id}
+                                {row[column1Key]}
                             </StyledTableCell>
                             <StyledTableCell align='right' component="th" scope="row">
-                                {row.candidate}
+                                {row[column2Key]}
                             </StyledTableCell>
                         </StyledTableRow>
                     ))}
