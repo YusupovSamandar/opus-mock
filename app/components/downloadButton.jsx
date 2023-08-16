@@ -3,11 +3,15 @@ import { CSVLink } from 'react-csv';
 import axios from 'axios';
 import Button from '@mui/material/Button';
 
+require('dotenv').config();
+
+const apiURL = process.env.NEXT_PUBLIC_API_URL;
+
 const DownloadButton = () => {
     const [jsonData, setJsonData] = useState(null);
 
     const fetchData = async () => {
-        const { data: { complete } } = await axios.get("http://localhost:4000/all")
+        const { data: { complete } } = await axios.get(`${apiURL}/all`);
         setJsonData(complete);
     };
 
