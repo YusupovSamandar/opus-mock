@@ -6,6 +6,7 @@ import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import ringSound from './eventually.mp3';
+import AlertAudioDialog from "../app/components/confirmation/audioDialog";
 
 const apiURL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -84,6 +85,7 @@ export default function Home() {
 
   return (
     <main className="flex p-4">
+      <AlertAudioDialog />
 
       <div className='pending-section'>
         <div className='section-title flex'>
