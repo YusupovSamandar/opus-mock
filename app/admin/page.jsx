@@ -60,6 +60,16 @@ export default function Examiner() {
         }, 1000);
     }
 
+    const clearAllData = async () => {
+        const textPrompt = prompt("type in 'yes' to confirm");
+        if (textPrompt.toLowerCase() === "yes") {
+            const deletedResponse = await axios.delete(`${apiURL}/all`);
+            alert(deletedResponse);
+        } else {
+            alert("process canceled");
+        }
+    }
+
     return (
         <>
             <Stack style={{ marginTop: "100px" }} justifyContent="center" direction="row" spacing={2}>
@@ -89,6 +99,8 @@ export default function Examiner() {
                 <div className="container m-auto">
                     <ExaminersTable customStyle={{ width: "70%", margin: "0 auto" }} column1={"examiners"} column2={"pending candidates"} content={examiners} column1Key={"examinerName"} column2Key={"pendingNumber"} />
                 </div>
+                <br /><br />
+                <Button variant="contained" onClick={clearAllData} disabled={buttonTx === "Processing..."}>Delete Data</Button>
             </div>
 
 
